@@ -1,14 +1,19 @@
 # summarize-movie
 
-動画を要約して議事録を生成するCLIツールです。文字起こしには mlx-whisper（Apple Silicon最適化）、要約には LM Studio のローカルLLMを使用し、完全にローカル環境で動作します。
+動画・音声ファイルを要約して議事録を生成するCLIツールです。文字起こしには mlx-whisper（Apple Silicon最適化）、要約には LM Studio のローカルLLMを使用し、完全にローカル環境で動作します。
 
 ## 特徴
 
-- 🎥 動画ファイルから自動で文字起こし（mlx-whisper / Apple Silicon最適化）
+- 🎥 動画・音声ファイルから自動で文字起こし（mlx-whisper / Apple Silicon最適化）
 - 🤖 ローカルLLMで要約・議事録生成（LM Studio）
 - 📝 Markdown / テキスト形式で出力
 - 🔒 完全ローカル処理（インターネット接続不要）
 - ⏱️ タイムスタンプ付きの文字起こし
+
+## 対応ファイル形式
+
+- **動画**: mp4, mov, avi, mkv, webm, m4v
+- **音声**: mp3, wav, m4a, flac, ogg, aac, wma
 
 ## 前提条件
 
@@ -58,7 +63,11 @@ pip install -e .
 ### 基本的な使い方
 
 ```bash
+# 動画ファイル
 summarize-movie meeting.mp4
+
+# 音声ファイル
+summarize-movie recording.mp3
 ```
 
 これにより、`meeting_summary_YYYYMMDD_HHMMSS.md` という名前で議事録が生成されます。
@@ -77,6 +86,9 @@ summarize-movie meeting.mp4 --model large-v3
 
 # 英語の動画を処理
 summarize-movie presentation.mp4 --language en
+
+# 音声ファイルを処理
+summarize-movie podcast.m4a -v
 
 # 詳細な出力を表示
 summarize-movie meeting.mp4 -v

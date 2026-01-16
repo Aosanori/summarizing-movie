@@ -10,6 +10,9 @@ from .transcriber import TranscriptionResult
 
 OutputFormat = Literal["markdown", "text"]
 
+# 音声ファイルの拡張子
+AUDIO_EXTENSIONS = {".mp3", ".wav", ".m4a", ".flac", ".ogg", ".aac", ".wma"}
+
 
 class OutputFormatter:
     """議事録の出力フォーマットを処理するクラス"""
@@ -22,7 +25,7 @@ class OutputFormatter:
     ):
         """
         Args:
-            video_path: 元の動画ファイルパス
+            video_path: 元の動画/音声ファイルパス
             transcription: 文字起こし結果
             summary_content: 要約内容（LLMからの生のレスポンス）
         """
@@ -30,6 +33,10 @@ class OutputFormatter:
         self.transcription = transcription
         self.summary_content = summary_content
         self.created_at = datetime.now()
+        # メディアタイプを判別
+        self.is_audio = self.video_path.suffix.lower() in AUDIO_EXTENSIONS
+        self.media_label = "音声ファイル" if self.is_audio else "動画ファイル"
+        self.duration_label = "音声の長さ" if self.is_audio else "動画の長さ"
 
     def format(self, output_format: OutputFormat = "markdown") -> str:
         """
@@ -53,8 +60,8 @@ class OutputFormatter:
         output = f"""# 議事録: {self.video_path.name}
 
 **作成日時**: {self.created_at.strftime("%Y年%m月%d日 %H:%M")}  
-**動画ファイル**: {self.video_path.name}  
-**動画の長さ**: {duration_str}  
+**{self.media_label}**: {self.video_path.name}  
+**{self.duration_label}**: {duration_str}  
 **検出言語**: {self.transcription.language}
 
 ---
@@ -79,8 +86,8 @@ class OutputFormatter:
         output = f"""議事録: {self.video_path.name}
 
 作成日時: {self.created_at.strftime("%Y年%m月%d日 %H:%M")}
-動画ファイル: {self.video_path.name}
-動画の長さ: {duration_str}
+{self.media_label}: {self.video_path.name}
+{self.duration_label}: {duration_str}
 検出言語: {self.transcription.language}
 
 {"=" * 50}

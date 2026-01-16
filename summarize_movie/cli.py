@@ -10,8 +10,14 @@ from .summarizer import Summarizer
 from .transcriber import Transcriber
 
 
+# サポートする拡張子
+SUPPORTED_VIDEO_EXTENSIONS = {".mp4", ".mov", ".avi", ".mkv", ".webm", ".m4v"}
+SUPPORTED_AUDIO_EXTENSIONS = {".mp3", ".wav", ".m4a", ".flac", ".ogg", ".aac", ".wma"}
+SUPPORTED_EXTENSIONS = SUPPORTED_VIDEO_EXTENSIONS | SUPPORTED_AUDIO_EXTENSIONS
+
+
 @click.command()
-@click.argument("video_path", type=click.Path(exists=True, path_type=Path))
+@click.argument("media_path", type=click.Path(exists=True, path_type=Path))
 @click.option(
     "-o",
     "--output",
@@ -71,7 +77,7 @@ from .transcriber import Transcriber
     help="詳細な出力を表示",
 )
 def main(
-    video_path: Path,
+    media_path: Path,
     output_path: Path | None,
     output_format: str,
     whisper_model: str,
@@ -83,13 +89,18 @@ def main(
     verbose: bool,
 ) -> None:
     """
-    動画を要約して議事録を生成します。
+    動画/音声ファイルを要約して議事録を生成します。
 
-    VIDEO_PATH: 処理する動画ファイルのパス
+    MEDIA_PATH: 処理する動画または音声ファイルのパス
     """
     try:
+        # ファイル形式を判定
+        file_ext = media_path.suffix.lower()
+        is_audio = file_ext in SUPPORTED_AUDIO_EXTENSIONS
+        media_type = "🎵 音声" if is_audio else "📹 動画"
+
         # Step 1: 文字起こし
-        click.echo(f"📹 動画を処理中: {video_path.name}")
+        click.echo(f"{media_type}を処理中: {media_path.name}")
         click.echo(f"🎯 Whisperモデル: {whisper_model}")
 
         if verbose:
@@ -104,12 +115,13 @@ def main(
         )
 
         transcription = transcriber.transcribe(
-            file_path=video_path,
+            file_path=media_path,
             language=language if language != "auto" else None,
         )
 
         duration_str = _format_duration(transcription.duration)
-        click.echo(f"✅ 文字起こし完了 (動画の長さ: {duration_str})")
+        duration_label = "音声の長さ" if is_audio else "動画の長さ"
+        click.echo(f"✅ 文字起こし完了 ({duration_label}: {duration_str})")
 
         if verbose:
             click.echo(f"   検出言語: {transcription.language}")
@@ -142,7 +154,7 @@ def main(
 
         output_fmt: OutputFormat = "markdown" if output_format == "markdown" else "text"
         saved_path = generate_output(
-            video_path=video_path,
+            video_path=media_path,
             transcription=transcription,
             summary_content=summary_content,
             output_path=output_path,
