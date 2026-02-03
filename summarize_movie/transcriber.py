@@ -13,6 +13,7 @@ class TranscriptSegment:
     start: float
     end: float
     text: str
+    speaker: str | None = None  # 話者分離で付与される話者名
 
     def format_timestamp(self) -> str:
         """タイムスタンプを HH:MM:SS 形式でフォーマット"""
@@ -36,12 +37,25 @@ class TranscriptionResult:
 
     @property
     def text_with_timestamps(self) -> str:
-        """タイムスタンプ付きのテキストを返す"""
+        """タイムスタンプ付きのテキストを返す（話者情報があれば含む）"""
         lines = []
         for seg in self.segments:
             timestamp = seg.format_timestamp()
-            lines.append(f"[{timestamp}] {seg.text.strip()}")
+            if seg.speaker:
+                lines.append(f"[{timestamp}] {seg.speaker}: {seg.text.strip()}")
+            else:
+                lines.append(f"[{timestamp}] {seg.text.strip()}")
         return "\n".join(lines)
+
+    @property
+    def has_speakers(self) -> bool:
+        """話者情報が付与されているかどうか"""
+        return any(seg.speaker is not None for seg in self.segments)
+
+    @property
+    def speakers(self) -> list[str]:
+        """話者のリストを返す"""
+        return sorted(set(seg.speaker for seg in self.segments if seg.speaker))
 
 
 class Transcriber:

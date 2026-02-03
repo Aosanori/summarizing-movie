@@ -57,13 +57,19 @@ class OutputFormatter:
         """Markdown形式で出力を生成"""
         duration_str = self._format_duration(self.transcription.duration)
 
+        # 話者情報がある場合は追加
+        speaker_info = ""
+        if self.transcription.has_speakers:
+            speakers = self.transcription.speakers
+            speaker_info = f"**話者**: {', '.join(speakers)}  \n"
+
         output = f"""# 議事録: {self.video_path.name}
 
 **作成日時**: {self.created_at.strftime("%Y年%m月%d日 %H:%M")}  
 **{self.media_label}**: {self.video_path.name}  
 **{self.duration_label}**: {duration_str}  
-**検出言語**: {self.transcription.language}
-
+**検出言語**: {self.transcription.language}  
+{speaker_info}
 ---
 
 {self.summary_content}
@@ -83,13 +89,19 @@ class OutputFormatter:
         # Markdownの記号を除去してプレーンテキストに変換
         summary_text = self._strip_markdown(self.summary_content)
 
+        # 話者情報がある場合は追加
+        speaker_info = ""
+        if self.transcription.has_speakers:
+            speakers = self.transcription.speakers
+            speaker_info = f"話者: {', '.join(speakers)}\n"
+
         output = f"""議事録: {self.video_path.name}
 
 作成日時: {self.created_at.strftime("%Y年%m月%d日 %H:%M")}
 {self.media_label}: {self.video_path.name}
 {self.duration_label}: {duration_str}
 検出言語: {self.transcription.language}
-
+{speaker_info}
 {"=" * 50}
 
 {summary_text}
