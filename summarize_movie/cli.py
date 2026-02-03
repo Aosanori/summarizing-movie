@@ -76,6 +76,12 @@ SUPPORTED_EXTENSIONS = SUPPORTED_VIDEO_EXTENSIONS | SUPPORTED_AUDIO_EXTENSIONS
     default=False,
     help="詳細な出力を表示",
 )
+@click.option(
+    "--chunk-size",
+    type=int,
+    default=20000,
+    help="要約時のチャンク分割サイズ（文字数） (デフォルト: 20000)",
+)
 def main(
     media_path: Path,
     output_path: Path | None,
@@ -87,6 +93,7 @@ def main(
     lm_model: str | None,
     no_timestamps: bool,
     verbose: bool,
+    chunk_size: int,
 ) -> None:
     """
     動画/音声ファイルを要約して議事録を生成します。
@@ -130,7 +137,7 @@ def main(
         # Step 2: 要約
         click.echo("\n⏳ 要約を生成中...")
 
-        summarizer = Summarizer(base_url=lm_studio_url, model=lm_model)
+        summarizer = Summarizer(base_url=lm_studio_url, model=lm_model, chunk_size=chunk_size)
 
         # 文字起こしテキストを準備
         if no_timestamps:

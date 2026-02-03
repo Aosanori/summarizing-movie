@@ -54,16 +54,19 @@ class Summarizer:
         base_url: str | None = None,
         api_key: str = "lm-studio",
         model: str | None = None,
+        chunk_size: int | None = None,
     ):
         """
         Args:
             base_url: LM Studio APIのベースURL
             api_key: APIキー（LM Studioでは通常不要）
             model: 使用するモデル名（Noneの場合、ロードされているモデルを使用）
+            chunk_size: チャンク分割時の最大文字数（デフォルト: 20000）
         """
         self.base_url = base_url or self.DEFAULT_BASE_URL
         self.api_key = api_key
         self.model = model
+        self.chunk_size = chunk_size or MAX_CHUNK_CHARS
         self._client: OpenAI | None = None
 
     def _get_client(self) -> OpenAI:
@@ -232,7 +235,7 @@ class Summarizer:
             str: LLMの生のレスポンス
         """
         # テキストが長い場合はチャンク分割して要約
-        if len(text) > MAX_CHUNK_CHARS:
+        if len(text) > self.chunk_size:
             return self._summarize_long_text(
                 text, system_prompt, max_tokens, temperature, on_chunk_progress
             )
@@ -276,7 +279,7 @@ class Summarizer:
 
         for line in lines:
             line_length = len(line) + 1  # +1 for newline
-            if current_length + line_length > MAX_CHUNK_CHARS and current_chunk:
+            if current_length + line_length > self.chunk_size and current_chunk:
                 chunks.append("\n".join(current_chunk))
                 current_chunk = [line]
                 current_length = line_length

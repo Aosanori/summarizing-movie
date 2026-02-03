@@ -104,6 +104,7 @@ summarize-movie meeting.mp4 -v
 | `--language` | `-l` | 文字起こし言語 | ja |
 | `--lm-studio-url` | | LM Studio APIのURL | http://localhost:1234/v1 |
 | `--device` | | 実行デバイス (auto/cpu/cuda) | auto |
+| `--chunk-size` | | 要約時のチャンク分割サイズ（文字数） | 20000 |
 | `--no-timestamps` | | タイムスタンプを含めない | false |
 | `--verbose` | `-v` | 詳細な出力 | false |
 
