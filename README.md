@@ -19,17 +19,10 @@
 
 ### 1. FFmpeg
 
-動画から音声を抽出するために FFmpeg が必要です。
+動画から音声を抽出するために FFmpeg が必要です（Homebrew でインストールした場合は自動で入ります）。
 
 ```bash
-# macOS (Homebrew)
 brew install ffmpeg
-
-# Ubuntu/Debian
-sudo apt install ffmpeg
-
-# Windows (Chocolatey)
-choco install ffmpeg
 ```
 
 ### 2. LM Studio
@@ -38,7 +31,7 @@ choco install ffmpeg
 2. 任意のモデルをダウンロード（日本語対応モデル推奨）
 3. 「Local Server」タブでサーバーを起動（デフォルト: `http://localhost:1234`）
 
-### 3. Python 3.9以上
+### 3. Python 3.9以上（pip インストールの場合）
 
 ```bash
 python --version  # 3.9以上であることを確認
@@ -46,16 +39,19 @@ python --version  # 3.9以上であることを確認
 
 ## インストール
 
+### Homebrew（推奨）
+
 ```bash
-# リポジトリをクローン（または直接ダウンロード）
+brew tap aosanori/summarizing-movie https://github.com/Aosanori/summarizing-movie.git
+brew install summarize-movie
+```
+
+### pip
+
+```bash
+git clone https://github.com/Aosanori/summarizing-movie.git
 cd summarizing-movie
-
-# 仮想環境を作成（推奨）
-python -m venv venv
-source venv/bin/activate  # Windows: venv\Scripts\activate
-
-# パッケージをインストール
-pip install -e .
+pip install .
 ```
 
 ## 使用方法
@@ -100,7 +96,7 @@ summarize-movie meeting.mp4 -v
 |-----------|-------|------|-----------|
 | `--output` | `-o` | 出力ファイルパス | 自動生成 |
 | `--format` | `-f` | 出力形式 (markdown/text) | markdown |
-| `--model` | | Whisperモデルサイズ | base |
+| `--model` | | Whisperモデルサイズ | large-v3-turbo |
 | `--language` | `-l` | 文字起こし言語 | ja |
 | `--lm-studio-url` | | LM Studio APIのURL | http://localhost:1234/v1 |
 | `--device` | | 実行デバイス (auto/cpu/cuda) | auto |
