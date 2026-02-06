@@ -2,7 +2,7 @@ class SummarizeMovie < Formula
   desc "CLI tool to summarize videos and generate meeting notes"
   homepage "https://github.com/Aosanori/summarizing-movie"
   url "https://github.com/Aosanori/summarizing-movie/archive/refs/tags/v0.1.0.tar.gz"
-  sha256 "PLACEHOLDER"
+  sha256 "002580139470174580d3f1c63e998afed82a9179eb1e7e7e1b3b1b2910d68e78"
   license "MIT"
   head "https://github.com/Aosanori/summarizing-movie.git", branch: "main"
 
@@ -39,9 +39,6 @@ class SummarizeMovie < Formula
         2. FFmpeg (installed as dependency)
 
       This tool is optimized for Apple Silicon (M1/M2/M3/M4).
-
-      For speaker diarization (--diarize), install optional dependencies:
-        #{libexec}/venv/bin/pip install pyannote.audio torch torchaudio
     EOS
   end
 
