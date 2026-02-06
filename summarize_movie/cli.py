@@ -5,6 +5,7 @@ from pathlib import Path
 
 import click
 
+from . import __version__
 from .output import OutputFormat, generate_output
 from .summarizer import Summarizer
 from .transcriber import Transcriber
@@ -17,6 +18,7 @@ SUPPORTED_EXTENSIONS = SUPPORTED_VIDEO_EXTENSIONS | SUPPORTED_AUDIO_EXTENSIONS
 
 
 @click.command()
+@click.version_option(version=__version__, prog_name="summarize-movie")
 @click.argument("media_path", type=click.Path(exists=True, path_type=Path))
 @click.option(
     "-o",
