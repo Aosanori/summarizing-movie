@@ -88,6 +88,9 @@ summarize-movie podcast.m4a -v
 
 # 詳細な出力を表示
 summarize-movie meeting.mp4 -v
+
+# LM Studioで使用するモデルを指定
+summarize-movie meeting.mp4 --lm-model "gemma-2-27b-it"
 ```
 
 ### 全オプション一覧
@@ -99,6 +102,7 @@ summarize-movie meeting.mp4 -v
 | `--model` | | Whisperモデルサイズ | large-v3-turbo |
 | `--language` | `-l` | 文字起こし言語 | ja |
 | `--lm-studio-url` | | LM Studio APIのURL | http://localhost:1234/v1 |
+| `--lm-model` | | LM Studioで使用するモデル名 | 自動検出 |
 | `--device` | | 実行デバイス (auto/cpu/cuda) | auto |
 | `--chunk-size` | | 要約時のチャンク分割サイズ（文字数） | 20000 |
 | `--no-timestamps` | | タイムスタンプを含めない | false |
