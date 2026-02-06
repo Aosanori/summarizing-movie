@@ -84,29 +84,6 @@ SUPPORTED_EXTENSIONS = SUPPORTED_VIDEO_EXTENSIONS | SUPPORTED_AUDIO_EXTENSIONS
     default=20000,
     help="要約時のチャンク分割サイズ（文字数） (デフォルト: 20000)",
 )
-@click.option(
-    "--diarize",
-    is_flag=True,
-    default=False,
-    help="話者分離を有効化（pyannote.audioを使用）",
-)
-@click.option(
-    "--hf-token",
-    envvar="HF_TOKEN",
-    default=None,
-    help="Hugging Face認証トークン（環境変数HF_TOKENでも可）",
-)
-@click.option(
-    "--num-speakers",
-    type=int,
-    default=None,
-    help="話者数（省略時は自動検出）",
-)
-@click.option(
-    "--identify-speakers/--no-identify-speakers",
-    default=True,
-    help="LM Studioで文脈から話者名を推定する (デフォルト: 有効)",
-)
 def main(
     media_path: Path,
     output_path: Path | None,
@@ -119,10 +96,6 @@ def main(
     no_timestamps: bool,
     verbose: bool,
     chunk_size: int,
-    diarize: bool,
-    hf_token: str | None,
-    num_speakers: int | None,
-    identify_speakers: bool,
 ) -> None:
     """
     動画/音声ファイルを要約して議事録を生成します。
@@ -163,62 +136,10 @@ def main(
             click.echo(f"   検出言語: {transcription.language}")
             click.echo(f"   セグメント数: {len(transcription.segments)}")
 
-        # Step 1.5: 話者分離（オプション）
-        if diarize:
-            click.echo("\n⏳ 話者分離を実行中...")
-
-            from .diarizer import Diarizer, assign_speakers_to_transcript
-
-            try:
-                diarizer = Diarizer(
-                    hf_token=hf_token,
-                    num_speakers=num_speakers,
-                    device=device,
-                )
-
-                diarization_segments = diarizer.diarize(media_path)
-                speaker_mapping = diarizer.get_speaker_mapping(diarization_segments)
-
-                # 文字起こしセグメントに話者情報を付与
-                assign_speakers_to_transcript(
-                    transcription.segments,
-                    diarization_segments,
-                    speaker_mapping,
-                )
-
-                speaker_count = len(speaker_mapping)
-                click.echo(f"✅ 話者分離完了 ({speaker_count}人の話者を検出)")
-
-                if verbose:
-                    for orig, label in speaker_mapping.items():
-                        click.echo(f"   {orig} → {label}")
-
-            except ValueError as e:
-                click.echo(f"⚠️ 話者分離をスキップ: {e}", err=True)
-
         # Step 2: 要約
         click.echo("\n⏳ 要約を生成中...")
 
         summarizer = Summarizer(base_url=lm_studio_url, model=lm_model, chunk_size=chunk_size)
-
-        # 話者名推定（話者分離が有効で、identify_speakersがTrueの場合）
-        if diarize and identify_speakers and transcription.has_speakers:
-            click.echo("   話者名を推定中...")
-            speakers = transcription.speakers
-            text_for_identification = transcription.text_with_timestamps
-
-            speaker_names = summarizer.identify_speakers(text_for_identification, speakers)
-
-            if speaker_names:
-                # 話者名を置換
-                for seg in transcription.segments:
-                    if seg.speaker and seg.speaker in speaker_names:
-                        seg.speaker = speaker_names[seg.speaker]
-
-                if verbose:
-                    click.echo("   推定結果:")
-                    for orig, name in speaker_names.items():
-                        click.echo(f"     {orig} → {name}")
 
         # 文字起こしテキストを準備
         if no_timestamps:
