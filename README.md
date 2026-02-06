@@ -42,7 +42,7 @@ python --version  # 3.9以上であることを確認
 ### Homebrew（推奨）
 
 ```bash
-brew tap aosanori/summarizing-movie https://github.com/Aosanori/summarizing-movie.git
+brew tap aosanori/summarize-movie
 brew install summarize-movie
 ```
 
